@@ -7,6 +7,7 @@ import styles from "./side-nav.module.css";
 
 const links = [
   { href: "/", label: "заказы" },
+  { href: "/equipment", label: "учет оборудования" },
   { href: "/promo", label: "промокоды" },
   { href: "/stats", label: "статистика" },
 ] as const;
