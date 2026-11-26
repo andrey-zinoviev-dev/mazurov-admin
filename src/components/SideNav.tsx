@@ -6,8 +6,9 @@ import { logoutAction } from "@/app/login/actions";
 import styles from "./side-nav.module.css";
 
 const links = [
-  { href: "/", label: "заказы" },
+  { href: "/orders", label: "заказы" },
   { href: "/equipment", label: "учет оборудования" },
+  { href: "/inventarization", label: "Инвентаризация"},
   { href: "/promo", label: "промокоды" },
   { href: "/stats", label: "статистика" },
 ] as const;
@@ -23,10 +24,10 @@ export function SideNav() {
     <nav className={styles.nav} aria-label="Навигация">
       <ul className={styles.list}>
         {links.map(({ href, label }) => {
-          const isCurrent =
-            href === "/"
-              ? pathname === "/" || pathname.startsWith("/orders")
-              : pathname.startsWith(href);
+          const isCurrent = pathname.startsWith(href);
+            // href === "/"
+            //   ? pathname === "/" || pathname.startsWith("/orders")
+            //   : pathname.startsWith(href);
 
           return (
             <li key={href}>

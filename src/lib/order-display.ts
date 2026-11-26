@@ -5,6 +5,12 @@ export type OrderStatusView = {
   tone: OrderStatusTone;
 };
 
+type ListPreview<T> = {
+  visible: T[];
+  hiddenCount: number;
+  total: number;
+}; 
+
 const STATUS_BY_CODE: Record<string, OrderStatusView> = {
   COMPLETED: { label: "Выполнен", tone: "done" },
   PENDING: { label: "Ожидает оплаты", tone: "pending" },
@@ -74,4 +80,15 @@ export function formatRentalPeriod(
   const range = (dates ?? "").trim();
   if (!range) return period;
   return `${period} (${range})`;
+}
+
+export function formatItemsInOrderPreview<T>(items: T[], limit = 3): ListPreview<T> {
+  const visibleItems = items.slice(0, limit);
+  const hiddenCount = Math.max(0, items.length - visibleItems.length);
+  return {
+    visible: visibleItems,
+    hiddenCount: hiddenCount,
+    total: items.length,
+  };
+
 }

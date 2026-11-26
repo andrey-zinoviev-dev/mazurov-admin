@@ -16,6 +16,7 @@ export const orderListSelect = {
   clientName: true,
   userName: true,
   phone: true,
+  items: true,
 } satisfies Prisma.OrderSelect;
 
 export type OrderListItem = Prisma.OrderGetPayload<{
@@ -77,6 +78,13 @@ export async function getRecentOrders() {
     where: notHidden,
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: RECENT_ORDERS_LIMIT,
+    select: orderListSelect,
+  });
+}
+
+export async function getAllOrders() {
+  return prisma.order.findMany({
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     select: orderListSelect,
   });
 }

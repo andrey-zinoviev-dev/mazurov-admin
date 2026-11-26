@@ -1,12 +1,16 @@
-import Link from "next/link";
+// import Link from "next/link";
+import { EntityRow } from "@/components/EntityRow/EntityRow";
 import {
-  formatMoney,
+  // formatMoney,
   formatOrderDate,
-  formatRentalPeriod,
+  // formatRentalPeriod,
   getOrderStatusView,
 } from "@/lib/order-display";
 import { getRecentOrders } from "@/lib/orders-query";
+import { formatItemsInOrderPreview } from "@/lib/order-display";
+
 import styles from "./page.module.css";
+import RowActions from "@/components/RowActions/RowActions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,34 +29,45 @@ export default async function Home() {
         <ul className={styles.list}>
           {orders.map((order) => {
             const status = getOrderStatusView(order.statusCode, order.status);
+            // console.log(status);
             const orderId = order.id.toString();
+            const orderDate = formatOrderDate(order.createdAt);
+            const previewItems = formatItemsInOrderPreview(order.items, 2);
+            const { visible: visibleItems, hiddenCount } = previewItems;
 
             return (
               <li key={orderId} className={styles.item}>
-                <Link href={`/orders/${orderId}`} className={styles.itemLink}>
-                  <div className={styles.itemTop}>
-                    <h2 className={styles.orderTitle}>Заказ {order.orderNumber}</h2>
-                    <p className={styles.status} data-tone={status.tone}>
-                      <span className={styles.statusDot} aria-hidden />
-                      {status.label}
-                    </p>
-                  </div>
-
-                  <dl className={styles.meta}>
-                    <div className={styles.metaRow}>
-                      <dt>Дата заказа:</dt>
-                      <dd>{formatOrderDate(order.createdAt)}</dd>
-                    </div>
-                    <div className={styles.metaRow}>
-                      <dt>Срок аренды:</dt>
-                      <dd>{formatRentalPeriod(order.days, order.dates)}</dd>
-                    </div>
-                    <div className={styles.metaRow}>
-                      <dt>Итого:</dt>
-                      <dd className={styles.total}>{formatMoney(order.total)}</dd>
-                    </div>
-                  </dl>
-                </Link>
+                <EntityRow
+                  title={`Заказ ${order.orderNumber}`}
+                  badge={status.label}
+                  subtitle={orderDate}
+                  cells={[{ label: "Срок аренды", value: `${order.days} дня - ${order.dates}` }, { label: "Итого", value: Number(order.total) }, { label: "Товары", value: <>
+                    <ul>
+                      {
+                        visibleItems.map((item) => {
+                          return <li key={item.id}>
+                            <span>{item.productName}</span>
+                          </li>
+                        })
+                      }
+                    </ul>
+                    <span>+ {hiddenCount} товаров в заказе</span>
+                  </> }]}
+                  actions={
+                    <RowActions actions={[
+                      {
+                        label: "Изменить статус заказа",
+                        opensDrawer: true,
+                      },
+                      {
+                        label: "Удалить",
+                        tone: "danger",
+                        opensDrawer: true,
+                      },
+                    ]} />
+                  }
+                  href={`/orders/${orderId}`}
+                />
               </li>
             );
           })}

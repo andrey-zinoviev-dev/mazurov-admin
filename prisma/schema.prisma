@@ -40,6 +40,8 @@ model Product {
 
   category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: NoAction)
 
+  inventarizationItems InventarizationItem[]
+
   @@index([categoryId])
   @@index([isActive])
   @@map("products")
@@ -177,4 +179,44 @@ model UsedPromocode {
 
   @@index([userId])
   @@map("used_promocodes")
+}
+
+enum InventarizationStatus {
+  in_progress
+  completed
+}
+
+model Inventarization {
+  id        BigInt                 @id @default(autoincrement())
+  date      DateTime               @default(now()) @db.DateTime(0)
+  inspector String                 @db.VarChar(255)
+  status    InventarizationStatus  @default(in_progress)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+
+  comment String? @db.Text
+
+  items InventarizationItem[]
+
+  @@index([status])
+  @@index([date])
+  @@map("inventarizations")
+}
+
+model InventarizationItem {
+  id                 BigInt @id @default(autoincrement())
+  inventarizationId  BigInt @map("inventarization_id")
+  productId          Int    @map("product_id")
+
+  actualQty   Int?            @map("actual_qty")
+
+  comment String? @db.Text
+
+  inventarization Inventarization @relation(fields: [inventarizationId], references: [id], onDelete: Cascade)
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@unique([inventarizationId, productId])
+  @@index([productId])
+  @@map("inventarization_items")
 }
